@@ -1,22 +1,18 @@
-.yui3-overlay {
-  /* border: 2px solid red; */
-}
-
-.yui3-test-grid-cell {
+.yui3-spriteeditor-grid-cell {
   border-color: green;
   border-left-width: 1px;
   border-left-style: solid;
   border-top-width: 1px;
   border-top-style: solid;
 
-  display: inline-block;
+  position: absolute;
 }
 
-.yui3-test-grid-cell-right {
+.yui3-spriteeditor-grid-cell-right {
   border-right-width: 1px;
   border-right-style: solid;
 }
-.yui3-test-grid-cell-bottom {
+.yui3-spriteeditor-grid-cell-bottom {
   border-bottom-width: 1px;
   border-bottom-style: solid;
 }
