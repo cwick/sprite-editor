@@ -8,6 +8,10 @@
   position: absolute;
 }
 
+.yui3-spriteeditor-active-cell {
+  background-color: red;
+}
+
 .yui3-spriteeditor-grid-cell-right {
   border-right-width: 1px;
   border-right-style: solid;

@@ -1,18 +1,31 @@
 // Create a new YUI instance and populate it with the required modules.
-YUI().use('overlay', function (Y) {
+YUI().use(['overlay', 'event'], function (Y) {
   var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
     renderUI: function() {
       for (var row=0; row<SpriteEditor.GRID_ROWS; row++) {
         for (var column=0; column<SpriteEditor.GRID_COLUMNS; column++) {
-          console.log(row, column);
           this._createGridCell(row, column);
         }
       }
     },
 
+    bindUI: function() {
+      var contentBox = this.get("contentBox");
+      contentBox.on("mouseover", function(e) {
+        this._activateGridCell(e.target);
+      }, this);
+      contentBox.on("click", function(e) {
+        this._activateGridCell(e.target);
+      }, this);
+    },
+
+    _activateGridCell: function(cell) {
+      cell.addClass(this.getClassName('active-cell'));
+    },
+
     _createGridCell: function(row, column) {
-      var width = (this.get("width") / SpriteEditor.GRID_COLUMNS) - 2;
-      var height = (this.get("height") / SpriteEditor.GRID_ROWS) - 2;
+      var width = this.get("width") / SpriteEditor.GRID_COLUMNS;
+      var height = this.get("height") / SpriteEditor.GRID_ROWS;
       var cell = Y.Node.create('<div></div>'),
           contentBox = this.get("contentBox");
 
@@ -26,8 +39,8 @@ YUI().use('overlay', function (Y) {
       }
 
       cell.setStyles({
-        width: (this.get("width") / SpriteEditor.GRID_COLUMNS) - 2,
-        height: (this.get("height") / SpriteEditor.GRID_ROWS) - 2,
+        width: width,
+        height: height,
         left: column*width,
         top: row*height
       });
@@ -38,8 +51,8 @@ YUI().use('overlay', function (Y) {
     GRID_ROWS: 10,
     GRID_COLUMNS: 10,
     ATTRS: {
-      width: { value: 500 },
-      height: { value: 500 },
+      width: { value: 501 },
+      height: { value: 501 },
       centered: { value: true }
     }
   });
