@@ -1,6 +1,21 @@
 // Create a new YUI instance and populate it with the required modules.
 YUI().use(['overlay', 'event'], function (Y) {
   var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
+    initializer: function() {
+      var cellWidth = this.get("width") / SpriteEditor.GRID_COLUMNS;
+      var cellHeight = this.get("height") / SpriteEditor.GRID_ROWS;
+      var stylesheet = Y.one("#test_stylesheet").getDOMNode().sheet;
+
+      var gridDimensions = "." + this.getClassName("grid-cell") +
+        "{ width: " + cellWidth + ";" +
+        " height: " + cellHeight + ";" +
+        "}";
+
+      this.set("cellWidth", cellWidth);
+      this.set("cellHeight", cellHeight);
+      stylesheet.insertRule(gridDimensions, 0);
+    },
+
     renderUI: function() {
       for (var row=0; row<SpriteEditor.GRID_ROWS; row++) {
         for (var column=0; column<SpriteEditor.GRID_COLUMNS; column++) {
@@ -24,8 +39,6 @@ YUI().use(['overlay', 'event'], function (Y) {
     },
 
     _createGridCell: function(row, column) {
-      var width = this.get("width") / SpriteEditor.GRID_COLUMNS;
-      var height = this.get("height") / SpriteEditor.GRID_ROWS;
       var cell = Y.Node.create('<div></div>'),
           contentBox = this.get("contentBox");
 
@@ -39,15 +52,14 @@ YUI().use(['overlay', 'event'], function (Y) {
       }
 
       cell.setStyles({
-        width: width,
-        height: height,
-        left: column*width,
-        top: row*height
+        left: column*this.get("cellWidth"),
+        top: row*this.get("cellHeight")
       });
 
       contentBox.append(cell);
     }
   }, {
+    // TODO: don't hard code dimensions, let user set them dynamically
     GRID_ROWS: 10,
     GRID_COLUMNS: 10,
     ATTRS: {
