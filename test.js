@@ -22,9 +22,9 @@ YUI({
    * interpolation, but sadly nobody supports it.
    *
    * This doesn't work in any browser I've tried
-   * finalContext.imageSmoothingEnabled = false;
-   * finalContext.webkitImageSmoothingEnabled = false;
-   * finalContext.mozImageSmoothingEnabled = false;
+   * context.imageSmoothingEnabled = false;
+   * context.webkitImageSmoothingEnabled = false;
+   * context.mozImageSmoothingEnabled = false;
    *
    * Implementing the image scaling ourself could be slower.
    * We could pre-render the images at the desired scale.
@@ -33,36 +33,21 @@ YUI({
    * challenge.
    *
    */
-  var scratchCanvas = Y.one("#scratch-canvas").getDOMNode(),
-      finalCanvas = Y.one("#final-canvas").getDOMNode(),
-      scratchContext = scratchCanvas.getContext("2d"),
-      finalContext = finalCanvas.getContext("2d");
+  var canvas = Y.one("canvas#preview").getDOMNode(),
+      context = canvas.getContext("2d"),
+      previewSize = 10,
+      editor = new Y.Game.SpriteEditor();
 
-  var imageWidth = Y.Game.SpriteEditor.GRID_COLUMNS,
-      imageHeight = Y.Game.SpriteEditor.GRID_ROWS;
+  canvas.width = Y.Game.SpriteEditor.GRID_COLUMNS * previewSize;
+  canvas.height = Y.Game.SpriteEditor.GRID_ROWS * previewSize;
 
-  scratchCanvas.width = imageWidth;
-  scratchCanvas.height = imageHeight;
-
-  var scale = 10;
-  finalCanvas.width = scratchCanvas.width * scale;
-  finalCanvas.height = scratchCanvas.height * scale;
-
-  var createImageData = function(inData) {
-    var canvasImage = finalContext.createImageData(imageWidth, imageHeight);
-    var outData = canvasImage.data;
-
-    convertImageData(inData, outData);
-    return canvasImage;
-  }
-
-  var editor = new Y.Game.SpriteEditor();
   editor.after('imageChange', function(e) {
-    var scaledData = finalContext.createImageData(finalCanvas.width, finalCanvas.height);
-    e.newVal.scale(scale, scaledData.data);
+    var scaledData = context.createImageData(canvas.width, canvas.height);
+    e.newVal.scale(previewSize, scaledData.data);
 
-    finalContext.putImageData(scaledData, 0, 0);
+    context.putImageData(scaledData, 0, 0);
   });
+
   editor.render();
 });
 
