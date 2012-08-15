@@ -2,7 +2,7 @@ YUI.add('game-sprite-editor', function(Y) {
 var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
   initializer: function() {
     this._initStylesheet();
-    this._initData();
+    this._initImage();
   },
 
   renderUI: function() {
@@ -38,25 +38,23 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
     stylesheet.insertRule(gridDimensions, 0);
   },
 
-  _initData: function() {
-    var numCells = SpriteEditor.GRID_ROWS * SpriteEditor.GRID_COLUMNS;
-    var data = new Array(numCells);
-    for (var i=0 ; i<numCells ; i++) {
-      data[i] = 0;
-    }
-
-    this._set('data', data);
-    this._data = data;
+  _initImage: function() {
+    this._image = new Y.Game.Image({
+      width: SpriteEditor.GRID_COLUMNS,
+      height: SpriteEditor.GRID_ROWS
+    });
+    this._image.clear([0,0,0,255]);
+    this._set('image', this._image);
   },
 
   _activateGridCell: function(cell) {
     cell.addClass(this.getClassName('active-cell'));
-    this._data[cell.getData('row')*SpriteEditor.GRID_COLUMNS + cell.getData('column')] = 1;
-    this._fireDataChange();
+    this._image.setPixel(cell.getData('column'), cell.getData('row'), [255, 0, 0, 255]);
+    this._fireImageChange();
   },
 
-  _fireDataChange: function() {
-    this._set('data', this._data);
+  _fireImageChange: function() {
+    this._set('image', this._image);
   },
 
   _createGridCell: function(row, column) {
@@ -89,10 +87,10 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
     width: { value: 501 },
     height: { value: 501 },
     centered: { value: true },
-    data: { readOnly: true, value: [] }
+    image: { readOnly: true }
   }
 });
 
 Y.namespace("Game").SpriteEditor = SpriteEditor;
-}, "", { requires: ['overlay'] });
+}, "", { requires: ['overlay', 'game-image'] });
 

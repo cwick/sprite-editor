@@ -15,9 +15,6 @@ YUI({
    * from the sprite editor and render the final
    * image at various scales.
    *
-   * Need to package the imaging scaling algorithm
-   * into its own class/module.
-   *
    * Need to create a separate widget that displays
    * the image using the scaling algorithm.
    *
@@ -51,17 +48,6 @@ YUI({
   finalCanvas.width = scratchCanvas.width * scale;
   finalCanvas.height = scratchCanvas.height * scale;
 
-  var convertImageData = function(inData, outData) {
-    for (var i=0 ; i<inData.length ; i++) {
-      outData[i*4] = inData[i]*255; // red
-      outData[i*4+1] = 0; // green
-      outData[i*4+2] = 0; // blue
-      outData[i*4+3] = 255; // alpha
-    }
-
-    return outData;
-  };
-
   var createImageData = function(inData) {
     var canvasImage = finalContext.createImageData(imageWidth, imageHeight);
     var outData = canvasImage.data;
@@ -71,18 +57,10 @@ YUI({
   }
 
   var editor = new Y.Game.SpriteEditor();
-  editor.after('dataChange', function(e) {
-    // Render the image data
-    var imageData = createImageData(e.newVal);
-    var image = new Y.Game.Image({
-      data: imageData.data,
-      width: imageData.width,
-      height: imageData.height});
-
+  editor.after('imageChange', function(e) {
     var scaledData = finalContext.createImageData(finalCanvas.width, finalCanvas.height);
-    image.scale(scale, scaledData.data);
+    e.newVal.scale(scale, scaledData.data);
 
-    scratchContext.putImageData(imageData, 0, 0);
     finalContext.putImageData(scaledData, 0, 0);
   });
   editor.render();

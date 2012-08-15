@@ -35,12 +35,37 @@ var Image = Y.Base.create("Image", Y.Base, [], {
       data: outData,
       width: newWidth,
       height: newHeight });
+  },
+
+  clear: function(pixelData) {
+    for (var x=0 ; x<this.get('width') ; x++) {
+      for (var y=0 ; y<this.get('height') ; y++) {
+        this.setPixel(x, y, pixelData);
+      }
+    }
+  },
+
+  setPixel: function(x, y, pixelData) {
+    var idx = Image.BYTES_PER_PIXEL * (y*this.get('width') + x);
+    var data = this.get('data');
+
+    for (var i=0 ; i<Image.BYTES_PER_PIXEL ; i++) {
+      data[idx+i] = pixelData[i];
+    }
+  },
+
+  _initData: function() {
+    return new Array(
+      this.get('width') *
+      this.get('height') *
+      Image.BYTES_PER_PIXEL);
   }
 }, {
   ATTRS: {
     width: { writeOnce: true },
     height: { writeOnce: true },
-    data: { writeOnce: true },
+    data: { writeOnce: true,
+            valueFn: "_initData" }
   },
   BYTES_PER_PIXEL: 4
 });
