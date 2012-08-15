@@ -2,18 +2,8 @@
 YUI().use(['overlay', 'event'], function (Y) {
   var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
     initializer: function() {
-      var cellWidth = this.get("width") / SpriteEditor.GRID_COLUMNS;
-      var cellHeight = this.get("height") / SpriteEditor.GRID_ROWS;
-      var stylesheet = Y.one("#test_stylesheet").getDOMNode().sheet;
-
-      var gridDimensions = "." + this.getClassName("grid-cell") +
-        "{ width: " + cellWidth + ";" +
-        " height: " + cellHeight + ";" +
-        "}";
-
-      this.set("cellWidth", cellWidth);
-      this.set("cellHeight", cellHeight);
-      stylesheet.insertRule(gridDimensions, 0);
+      this._initStylesheet();
+      this._initData();
     },
 
     renderUI: function() {
@@ -34,8 +24,41 @@ YUI().use(['overlay', 'event'], function (Y) {
       }, this);
     },
 
+    _initStylesheet: function() {
+      var cellWidth = this.get("width") / SpriteEditor.GRID_COLUMNS;
+      var cellHeight = this.get("height") / SpriteEditor.GRID_ROWS;
+      var stylesheet = Y.one("#test_stylesheet").getDOMNode().sheet;
+
+      var gridDimensions = "." + this.getClassName("grid-cell") +
+        "{ width: " + cellWidth + ";" +
+        "  height: " + cellHeight + ";" +
+        "}";
+
+      this.set("cellWidth", cellWidth);
+      this.set("cellHeight", cellHeight);
+      stylesheet.insertRule(gridDimensions, 0);
+    },
+
+    _initData: function() {
+      var numCells = SpriteEditor.GRID_ROWS * SpriteEditor.GRID_COLUMNS;
+      var data = new Array(numCells);
+      for (var i=0 ; i<numCells ; i++) {
+        data[i] = 0;
+      }
+
+      this._set('data', data);
+      this._data = data;
+    },
+
     _activateGridCell: function(cell) {
       cell.addClass(this.getClassName('active-cell'));
+      this._data[cell.getData('row')*SpriteEditor.GRID_COLUMNS + cell.getData('column')] = 1;
+      this._fireDataChange();
+    },
+
+    _fireDataChange: function() {
+      this._set('data', this._data);
+      console.log(this._data);
     },
 
     _createGridCell: function(row, column) {
@@ -43,6 +66,8 @@ YUI().use(['overlay', 'event'], function (Y) {
           contentBox = this.get("contentBox");
 
       cell.addClass(this.getClassName('grid-cell'));
+      cell.setData('row', row);
+      cell.setData('column', column);
 
       if (row == SpriteEditor.GRID_ROWS-1) {
         cell.addClass(this.getClassName('grid-cell-bottom'));
@@ -65,7 +90,8 @@ YUI().use(['overlay', 'event'], function (Y) {
     ATTRS: {
       width: { value: 501 },
       height: { value: 501 },
-      centered: { value: true }
+      centered: { value: true },
+      data: { readOnly: true, value: [] }
     }
   });
 
