@@ -1,4 +1,9 @@
 .yui3-spriteeditor-grid-cell {
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+
   border-color: green;
   border-left-width: 1px;
   border-left-style: solid;
