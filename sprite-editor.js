@@ -1,8 +1,10 @@
 YUI.add('game-sprite-editor', function(Y) {
-var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
+var MOUSE_LEFT = 1;
+
+var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
   initializer: function() {
     this._initClasses();
-    this._initStylesheet();
+    this._initStyle();
     this._initImage();
 
     this._isPainting = false;
@@ -18,8 +20,10 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
 
   bindUI: function() {
     var contentBox = this.get("contentBox");
-    contentBox.on("gesturemoveend", function(e) {
-      this._isPainting = false;
+    contentBox.on("gesturemovestart", function(e) {
+      if (e.button == MOUSE_LEFT) {
+        this._isPainting = true;
+      }
     }, null, this);
 
     contentBox.on("gesturemove", function(e) {
@@ -29,8 +33,8 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
       }
     }, null, this);
 
-    contentBox.on("gesturemovestart", function(e) {
-      this._isPainting = true;
+    contentBox.on("gesturemoveend", function(e) {
+      this._isPainting = false;
     }, null, this);
 
     contentBox.on("click", function(e) {
@@ -44,11 +48,14 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
     this.CSS_GRID_CELL_RIGHT = this.getClassName("grid-cell-right");
   },
 
-  _initStylesheet: function() {
+  // Sets up styles that must be computed dynamically
+  _initStyle: function() {
     var cellWidth = this.get("width") / SpriteEditor.GRID_COLUMNS;
     var cellHeight = this.get("height") / SpriteEditor.GRID_ROWS;
     var stylesheet = Y.one("#test_stylesheet").getDOMNode().sheet;
 
+    // Modify the main stylesheet to size the cells, rather than
+    // setting the same style on each one individually
     var gridDimensions = "." + this.CSS_GRID_CELL +
       "{ width: " + cellWidth + ";" +
       "  height: " + cellHeight + ";" +
@@ -57,6 +64,9 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
     this.set("cellWidth", cellWidth);
     this.set("cellHeight", cellHeight);
     stylesheet.insertRule(gridDimensions, 0);
+
+    // Horizontal centering
+    this.get("boundingBox").setStyle("marginLeft", this.get("width") / -2);
   },
 
   _initImage: function() {
@@ -69,8 +79,13 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
   },
 
   _activateGridCell: function(cell) {
+    var color = this.get('paintColor');
+
     cell.addClass(this.getClassName('active-cell'));
-    this._image.setPixel(cell.getData('column'), cell.getData('row'), [255, 0, 0, 255]);
+    this._image.setPixel(
+        cell.getData('column'),
+        cell.getData('row'),
+        [color[0], color[1], color[2], 255]);
     this._fireImageChange();
   },
 
@@ -107,8 +122,8 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Overlay, [], {
   ATTRS: {
     width: { value: 501 },
     height: { value: 501 },
-    centered: { value: true },
-    image: { readOnly: true }
+    image: { readOnly: true },
+    paintColor: { value: [255, 0, 0] }
   }
 });
 
