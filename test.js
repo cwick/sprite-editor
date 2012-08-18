@@ -10,7 +10,7 @@ YUI({
       }
     }
   }
-}).use(['game-image', 'game-sprite-editor'], function (Y) {
+}).use(['game-image', 'game-sprite-editor', 'game-sprite-preview'], function (Y) {
   /* Proof of concept. We capture data change events
    * from the sprite editor and render the final
    * image at various scales.
@@ -33,21 +33,14 @@ YUI({
    * challenge.
    *
    */
-  var canvas = Y.one("canvas#preview").getDOMNode(),
-      context = canvas.getContext("2d"),
-      previewSize = 10,
-      editor = new Y.Game.SpriteEditor();
-
-  canvas.width = Y.Game.SpriteEditor.GRID_COLUMNS * previewSize;
-  canvas.height = Y.Game.SpriteEditor.GRID_ROWS * previewSize;
+  var editor = new Y.Game.SpriteEditor(),
+      preview = new Y.Game.SpritePreview();
 
   editor.after('imageChange', function(e) {
-    var scaledData = context.createImageData(canvas.width, canvas.height);
-    e.newVal.scale(previewSize, scaledData.data);
-
-    context.putImageData(scaledData, 0, 0);
+    preview.set('image', e.newVal);
   });
 
   editor.render();
+  preview.render();
 });
 
