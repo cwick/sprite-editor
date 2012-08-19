@@ -28,7 +28,10 @@ var SpritePreview = Y.Base.create("SpritePreview", Y.Widget, [Y.WidgetPosition],
       this._canvas.get('width'),
       this._canvas.get('height'));
 
-    image.scale(this.get('previewSize'), scaledData.data);
+    image.scale({
+      factor: this.get('previewSize'),
+      outData: scaledData.data
+    });
     context.putImageData(scaledData, 0, 0);
   }
 }, {
