@@ -6,17 +6,19 @@ var Image = Y.Base.create("Image", Y.Base, [], {
     }
   },
 
-  scale: function(factor, outData) {
-    var ratio = 1/factor,
+  scale: function(options) {
+    var subregion = this._getSubregion(options.subregion),
+        factor = options.factor,
+        outData = options.outData,
         inData = this.get('data'),
-        oldWidth = this.get('width'),
-        oldHeight = this.get('height'),
+        oldWidth = subregion.width,
+        oldHeight = subregion.height,
         newWidth = oldWidth*factor,
-        newHeight = oldHeight*factor;
-    var sx, sy, didx, sidx;
+        newHeight = oldHeight*factor,
+        sx, sy, didx, sidx;
 
     if (!outData) {
-      outData = new Array(
+      outData = new Uint8ClampedArray(
         newWidth *
         newHeight *
         Image.BYTES_PER_PIXEL);
@@ -24,8 +26,8 @@ var Image = Y.Base.create("Image", Y.Base, [], {
 
     for (var i=0 ; i<newHeight ; i++) {
       for (var j=0 ; j<newWidth; j++) {
-        sx = Math.floor(j*ratio);
-        sy = Math.floor(i*ratio);
+        sx = Math.floor((j/factor) + subregion.x);
+        sy = Math.floor((i/factor) + subregion.y);
 
         didx = Image.BYTES_PER_PIXEL*((i*newWidth)+j);
         sidx = Image.BYTES_PER_PIXEL*((sy*oldWidth)+sx);
@@ -61,10 +63,45 @@ var Image = Y.Base.create("Image", Y.Base, [], {
   },
 
   _initData: function() {
-    this.set('data', new Array(
+    this.set('data', new Uint8ClampedArray(
       this.get('width') *
       this.get('height') *
       Image.BYTES_PER_PIXEL));
+  },
+
+  _getSubregion: function(subregion) {
+    var width = this.get('width');
+    var height = this.get('height');
+
+    subregion = subregion || {}
+    if (!Y.Lang.isValue(subregion.x)) {
+      subregion.x = 0;
+    }
+    if (!Y.Lang.isValue(subregion.y)) {
+      subregion.y = 0;
+    }
+    if (!Y.Lang.isValue(subregion.height)) {
+      subregion.height = this.get('height');
+    }
+    if (!Y.Lang.isValue(subregion.width)) {
+      subregion.width = this.get('width');
+    }
+
+    // Clamp x and y to valid values
+    if (subregion.x < 0) { subregion.x = 0; }
+    else if (subregion.x >= width) { subregion.x = width-1; }
+    if (subregion.y < 0) { subregion.y = 0; }
+    else if (subregion.y >= height) { subregion.y = height-1; }
+
+    // Clamp width and height to valid values
+    if (subregion.x + subregion.width >= width) {
+      subregion.width = width - subregion.x;
+    }
+    if (subregion.y + subregion.height >= height) {
+      subregion.height = height - subregion.y;
+    }
+
+    return subregion;
   }
 }, {
   ATTRS: {
