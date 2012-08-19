@@ -10,51 +10,12 @@ YUI({
       }
     }
   }
-}).use(['game-image', 'game-sprite-editor', 'game-sprite-preview'], function (Y) {
-  /* Proof of concept. We capture data change events
-   * from the sprite editor and render the final
-   * image at various scales.
-   *
-   * Need to create a separate widget that displays
-   * the image using the scaling algorithm.
-   *
-   * Browsers are supposed to have nearest-neighbor
-   * interpolation, but sadly nobody supports it.
-   *
-   * This doesn't work in any browser I've tried
-   * context.imageSmoothingEnabled = false;
-   * context.webkitImageSmoothingEnabled = false;
-   * context.mozImageSmoothingEnabled = false;
-   *
-   * Implementing the image scaling ourself could be slower.
-   * We could pre-render the images at the desired scale.
-   * However, dynamically scaling an image at runtime
-   * (think explosions and special effects) could be a
-   * challenge.
-   *
-   */
-  var editor = new Y.Game.SpriteEditor(),
-      preview = new Y.Game.SpritePreview();
-
-  editor.after('imageChange', function(e) {
-    preview.set('image', e.newVal);
+}).use(['game-sprite-editor'], function (Y) {
+  var editor = new Y.Game.SpriteEditor();
+  var editor2 = new Y.Game.SpriteEditor({
+    imageData: editor.imageData
   });
-
-  var colorPicker = Y.Node.create("<input type='text'/>");
-  var $colorPicker = $(colorPicker.getDOMNode());
-
-  Y.one('body').append(colorPicker);
-  $colorPicker.spectrum({
-    showPalette: true,
-    change: function(color) {
-      color = color.toRgb();
-      color = [color.r, color.g, color.b];
-      console.log(color);
-      editor.set('paintColor', color);
-    }
-  });
-
 
   editor.render();
-  preview.render();
+  editor2.render();
 });
