@@ -89,7 +89,7 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
   _activateGridCell: function(cell) {
     var color = this.get('paintColor');
 
-    cell.setStyle('background-color',
+    cell.setStyle('backgroundColor',
         'rgb('+color[0]+','+color[1]+','+color[2]+')');
 
     this._image.setPixel(
