@@ -1,11 +1,22 @@
 YUI.add('game-sprite-editor', function(Y) {
 var MOUSE_LEFT = 1;
 
-var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
+var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
+  [Y.WidgetPosition, Y.WidgetPositionAlign], {
+
   initializer: function() {
     this._initClasses();
     this._initStyle();
     this._initImage();
+
+    this.set('align', {
+      points: [Y.WidgetPositionAlign.TC, Y.WidgetPositionAlign.TC]
+    });
+
+    this.set('alignOn', [{
+      node: Y.one('win'),
+      eventName: 'resize'
+    }]);
 
     this._isPainting = false;
   },
@@ -64,9 +75,6 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
     this.set("cellWidth", cellWidth);
     this.set("cellHeight", cellHeight);
     stylesheet.insertRule(gridDimensions, 0);
-
-    // Horizontal centering
-    this.get("boundingBox").setStyle("marginLeft", this.get("width") / -2);
   },
 
   _initImage: function() {

@@ -1,8 +1,3 @@
-.yui3-spriteeditor {
-  position: absolute;
-  left: 50%;
-}
-
 .yui3-spriteeditor-grid-cell {
   -webkit-user-drag: none;
   -webkit-user-select: none;
