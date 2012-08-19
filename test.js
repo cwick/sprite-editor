@@ -41,10 +41,19 @@ YUI({
   });
 
   var colorPicker = Y.Node.create("<input type='text'/>");
+  var $colorPicker = $(colorPicker.getDOMNode());
+
   Y.one('body').append(colorPicker);
-  $(colorPicker.getDOMNode()).spectrum({
-    showPalette: true
+  $colorPicker.spectrum({
+    showPalette: true,
+    change: function(color) {
+      color = color.toRgb();
+      color = [color.r, color.g, color.b];
+      console.log(color);
+      editor.set('paintColor', color);
+    }
   });
+
 
   editor.render();
   preview.render();
