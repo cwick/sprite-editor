@@ -1,5 +1,11 @@
 YUI.add('game-image', function(Y) {
 var Image = Y.Base.create("Image", Y.Base, [], {
+  initializer: function() {
+    if (!this.get('data')) {
+      this._initData();
+    }
+  },
+
   scale: function(factor, outData) {
     var ratio = 1/factor,
         inData = this.get('data'),
@@ -55,17 +61,16 @@ var Image = Y.Base.create("Image", Y.Base, [], {
   },
 
   _initData: function() {
-    return new Array(
+    this.set('data', new Array(
       this.get('width') *
       this.get('height') *
-      Image.BYTES_PER_PIXEL);
+      Image.BYTES_PER_PIXEL));
   }
 }, {
   ATTRS: {
     width: { writeOnce: true },
     height: { writeOnce: true },
-    data: { writeOnce: true,
-            valueFn: "_initData" }
+    data: { writeOnce: true }
   },
   BYTES_PER_PIXEL: 4
 });
