@@ -40,13 +40,12 @@ YUI({
     preview.set('image', e.newVal);
   });
 
-  // $('#color-picker').spectrum({
-  //   // flat: true,
-  //   showPalette: true,
-  //   chooseText: "afga",
-  // });
+  var colorPicker = Y.Node.create("<input type='text'/>");
+  Y.one('body').append(colorPicker);
+  $(colorPicker.getDOMNode()).spectrum({
+    showPalette: true
+  });
 
   editor.render();
   preview.render();
 });
-
