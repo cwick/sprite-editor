@@ -1,3 +1,4 @@
+"use strict";
 YUI.add('game-image', function(Y) {
 var Image = Y.Base.create("Image", Y.Base, [], {
   initializer: function() {
