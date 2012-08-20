@@ -5,8 +5,6 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
   [Y.Game.SpriteEditorController], {
 
   initializer: function() {
-    this._isPainting = false;
-
     this.get('canvas').after('imageDataChange', this.syncUI, this);
 
     ['width', 'height', 'workspaceColor', 'viewport'].forEach(
