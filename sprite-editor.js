@@ -1,9 +1,9 @@
 "use strict";
 YUI.add('game-sprite-editor', function(Y) {
-var MOUSE_LEFT = 1;
-var KEY_SPACE = 32;
 
-var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
+var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
+  [Y.Game.SpriteEditorController], {
+
   initializer: function() {
     this._isPainting = false;
 
@@ -28,58 +28,6 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
         -this.get('viewport.y'));
   },
 
- // TODO: split into separate module sprite-editor-controller
-  bindUI: function() {
-    var contentBox = this.get("contentBox");
-    var document = Y.one('document');
-    var shit = false;
-
-    document.on('keydown', function(e) {
-      if (e.keyCode == KEY_SPACE) {
-        shit = true;
-        contentBox.setStyle('cursor', '-webkit-grab');
-        contentBox.setStyle('cursor', '-moz-grab');
-        e.preventDefault();
-      }
-    });
-
-    document.on('keyup', function(e) {
-      if (e.keyCode == KEY_SPACE) {
-        shit = false;
-        contentBox.setStyle('cursor', '');
-        e.preventDefault();
-      }
-    });
-
-    contentBox.on("gesturemovestart", function(e) {
-      if (e.button == MOUSE_LEFT) {
-        this._isPainting = true;
-      }
-    }, null, this);
-
-    contentBox.on("gesturemove", function(e) {
-      var target = this.get('displayCanvas');
-      if (shit) {
-        this.shitInHitlersMouth(e);
-      } else
-      if (this._isPainting && e.target._node === target.get('node')) {
-        this._paint(e);
-      }
-    }, null, this);
-
-    contentBox.on("gesturemoveend", function(e) {
-      this._isPainting = false;
-    }, null, this);
-
-    contentBox.on("click", function(e) {
-      this._paint(e);
-    }, this);
-  },
-
-  shitInHitlersMouth: function(e) {
-    this.set('viewport.x', 10);
-    this.set('viewport.y', 10);
-  },
   _paint: function(evt) {
     var x = Y.Lang.isValue(evt._event.offsetX) ? evt._event.offsetX : evt._event.layerX;
     var y = Y.Lang.isValue(evt._event.offsetY) ? evt._event.offsetY : evt._event.layerY;
@@ -122,5 +70,5 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
 });
 
 Y.namespace("Game").SpriteEditor = SpriteEditor;
-}, "", { requires: ['game-canvas', 'event-move', 'node', 'base', 'widget'] });
+}, "", { requires: ['game-sprite-editor-controller', 'game-canvas', 'event-move', 'node', 'base', 'widget'] });
 
