@@ -7,12 +7,11 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
   initializer: function() {
     this._isPainting = false;
 
-    this.get('displayCanvas').set('imageSmoothingEnabled', false);
     this.get('canvas').after('imageDataChange', this.syncUI, this);
 
-    ['widthChange', 'heightChange', 'workspaceColorChange'].forEach(
+    ['width', 'height', 'workspaceColor', 'viewport'].forEach(
       function(attributeChange) {
-        this.after(attributeChange, this.syncUI, this);
+        this.after(attributeChange + 'Change', this.syncUI, this);
       }, this);
   },
 
@@ -23,16 +22,21 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
 
   syncUI: function() {
     this.get('displayCanvas').clear(this.get('workspaceColor'));
-    this.get('canvas').copyTo(this.get('displayCanvas'));
+    this.get('canvas').copyTo(
+        this.get('displayCanvas'),
+        -this.get('viewport.x'),
+        -this.get('viewport.y'));
   },
 
  // TODO: split into separate module sprite-editor-controller
   bindUI: function() {
     var contentBox = this.get("contentBox");
     var document = Y.one('document');
+    var shit = false;
 
     document.on('keydown', function(e) {
       if (e.keyCode == KEY_SPACE) {
+        shit = true;
         contentBox.setStyle('cursor', '-webkit-grab');
         contentBox.setStyle('cursor', '-moz-grab');
         e.preventDefault();
@@ -41,6 +45,7 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
 
     document.on('keyup', function(e) {
       if (e.keyCode == KEY_SPACE) {
+        shit = false;
         contentBox.setStyle('cursor', '');
         e.preventDefault();
       }
@@ -54,8 +59,10 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
 
     contentBox.on("gesturemove", function(e) {
       var target = this.get('displayCanvas');
+      if (shit) {
+        this.shitInHitlersMouth(e);
+      } else
       if (this._isPainting && e.target._node === target.get('node')) {
-        console.log('paint');
         this._paint(e);
       }
     }, null, this);
@@ -69,6 +76,10 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget, [], {
     }, this);
   },
 
+  shitInHitlersMouth: function(e) {
+    this.set('viewport.x', 10);
+    this.set('viewport.y', 10);
+  },
   _paint: function(evt) {
     var x = Y.Lang.isValue(evt._event.offsetX) ? evt._event.offsetX : evt._event.layerX;
     var y = Y.Lang.isValue(evt._event.offsetY) ? evt._event.offsetY : evt._event.layerY;
