@@ -2,7 +2,7 @@
 YUI.add('game-sprite-editor', function(Y) {
 
 var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
-  [Y.Game.SpriteEditorController], {
+  [Y.Game.SpriteEditorController, Y.Game.SpriteEditorTools], {
 
   initializer: function() {
     this.get('canvas').after('imageDataChange', this.syncUI, this);
@@ -26,6 +26,7 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
         -this.get('viewport.y'));
   },
 
+  // TODO: This should be part of the pencil tool
   _paint: function(evt) {
     var x = Y.Lang.isValue(evt._event.offsetX) ? evt._event.offsetX : evt._event.layerX;
     var y = Y.Lang.isValue(evt._event.offsetY) ? evt._event.offsetY : evt._event.layerY;
@@ -55,6 +56,7 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
       }
     },
     workspaceColor: { value: "grey" },
+    // TODO: support CSS colors
     brushColor: { value: [0,255,0,255] },
     canvas: {
       valueFn: function() {
@@ -68,5 +70,12 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
 });
 
 Y.namespace("Game").SpriteEditor = SpriteEditor;
-}, "", { requires: ['game-sprite-editor-controller', 'game-canvas', 'event-move', 'node', 'base', 'widget'] });
+}, "", { requires: [
+  'game-sprite-editor-tools',
+  'game-sprite-editor-controller',
+  'game-canvas',
+  'event-move',
+  'node',
+  'base',
+  'widget'] });
 

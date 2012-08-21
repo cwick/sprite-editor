@@ -4,44 +4,9 @@ YUI.add('game-sprite-editor-controller', function(Y) {
 var MOUSE_LEFT = 1;
 var KEY_SPACE = 32;
 
-var SpriteEditorController = function() {
-  this._tool = 'pencil';
-};
+var SpriteEditorController = function() { };
 
 SpriteEditorController.prototype = {
-  _tools: {
-    hand: {
-      init: function(editor) {
-        var contentBox = editor.get('contentBox');
-        contentBox.setStyle('cursor', '-webkit-grab');
-        contentBox.setStyle('cursor', '-moz-grab');
-      },
-      apply: function() {
-      }
-    },
-    pencil: {
-      init: function() {
-        var contentBox = this.get('contentBox');
-        contentBox.setStyle('cursor', '');
-      },
-      apply: function(e) {
-      }
-    }
-  },
-
-  _setTool: function(tool) {
-    this._tool = tool;
-    this._tools[tool].init.apply(this);
-
-    if (!this._tools[tool]._state) {
-      this._tools[tool]._state = {}
-    }
-  },
-
-  _applyTool: function(e) {
-    this._tools[tool].apply.apply(this
-  },
-
   bindUI: function() {
     var contentBox = this.get("contentBox");
     var document = Y.one('document');
@@ -49,21 +14,21 @@ SpriteEditorController.prototype = {
 
     document.on('keydown', function(e) {
       if (e.keyCode == KEY_SPACE) {
-        this._setTool('hand');
+        this.set('tool', 'hand');
         e.preventDefault();
       }
     }, this);
 
     document.on('keyup', function(e) {
       if (e.keyCode == KEY_SPACE) {
-        this._setTool('pencil');
+        this.set('tool', 'pencil');
         e.preventDefault();
       }
     }, this);
 
     contentBox.on("gesturemovestart", function(e) {
       if (e.button == MOUSE_LEFT) {
-        this._applyTool(e);
+        this.applyCurrentTool(e);
       }
     }, null, this);
 
@@ -81,9 +46,11 @@ SpriteEditorController.prototype = {
       this._isPainting = false;
     }, null, this);
 
-    contentBox.on("click", function(e) {
-      this._paint(e);
-    }, this);
+    // contentBox.on("click", function(e) {
+    //   if (e.button == MOUSE_LEFT) {
+    //     this.applyCurrentTool(e);
+    //   }
+    // }, this);
   },
 
   shitInHitlersMouth: function(e) {
@@ -93,5 +60,5 @@ SpriteEditorController.prototype = {
 };
 
 Y.namespace("Game").SpriteEditorController = SpriteEditorController;
-});
+}, "", { requires: [] });
 
