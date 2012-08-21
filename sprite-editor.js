@@ -26,14 +26,6 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
         -this.get('viewport.y'));
   },
 
-  // TODO: This should be part of the pencil tool
-  _paint: function(evt) {
-    var x = Y.Lang.isValue(evt._event.offsetX) ? evt._event.offsetX : evt._event.layerX;
-    var y = Y.Lang.isValue(evt._event.offsetY) ? evt._event.offsetY : evt._event.layerY;
-
-    this.get('canvas').setPixel(x, y, this.get('brushColor'));
-  },
-
   CONTENT_TEMPLATE: null,
 }, {
   ATTRS: {

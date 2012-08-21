@@ -10,7 +10,6 @@ SpriteEditorController.prototype = {
   bindUI: function() {
     var contentBox = this.get("contentBox");
     var document = Y.one('document');
-    var shit = false;
 
     document.on('keydown', function(e) {
       if (e.keyCode == KEY_SPACE) {
@@ -28,34 +27,21 @@ SpriteEditorController.prototype = {
 
     contentBox.on("gesturemovestart", function(e) {
       if (e.button == MOUSE_LEFT) {
-        this.applyCurrentTool(e);
+        this._pen('penDown', e);
       }
     }, null, this);
 
     contentBox.on("gesturemove", function(e) {
-      var target = this.get('displayCanvas');
-      if (shit) {
-        this.shitInHitlersMouth(e);
-      } else
-      if (this._isPainting && e.target._node === target.get('node')) {
-        this._paint(e);
-      }
+      this._pen('penMove', e);
     }, null, this);
 
     contentBox.on("gesturemoveend", function(e) {
-      this._isPainting = false;
+      this._pen('penUp', e);
     }, null, this);
-
-    // contentBox.on("click", function(e) {
-    //   if (e.button == MOUSE_LEFT) {
-    //     this.applyCurrentTool(e);
-    //   }
-    // }, this);
   },
 
-  shitInHitlersMouth: function(e) {
-    this.set('viewport.x', -10);
-    this.set('viewport.y', -10);
+  _pen: function(motion, e) {
+    this.fire(motion, {x: e._event.offsetX, y: e._event.offsetY});
   },
 };
 

@@ -5,6 +5,9 @@ YUI.add('game-sprite-editor-tools', function(Y) {
 // interface Tool {
 //   property name: string
 //   function select(SpriteEditor)
+//   function penDown(MotionEvent)
+//   function penMove(MotionEvent)
+//   function penUp(MotionEvent)
 // }
 
 var PencilTool = {
@@ -13,10 +16,20 @@ var PencilTool = {
   select: function(editor) {
     var contentBox = editor.get('contentBox');
     contentBox.setStyle('cursor', '');
+    this._editor = editor
   },
 
-  apply: function(evt) {
-    console.log('pencil!');
+  penDown: function(e) {
+    this._paint(e.x, e.y);
+  },
+
+  penMove: function(e) {
+    this._paint(e.x, e.y);
+  },
+
+  _paint: function(x,y) {
+    var color = this._editor.get('brushColor');
+    this._editor.get('canvas').setPixel(x, y, color);
   }
 };
 
@@ -27,10 +40,6 @@ var HandTool = {
     var contentBox = editor.get('contentBox');
     contentBox.setStyle('cursor', '-webkit-grab');
     contentBox.setStyle('cursor', '-moz-grab');
-  },
-
-  apply: function(evt) {
-    console.log('hand!');
   }
 };
 
@@ -42,18 +51,25 @@ var SpriteEditorTools = function() {
   TOOLS.forEach(function(tool){
     this.registerTool(Y.Object(tool));
   }, this);
+
+  // Send pen motion events to the current tool
+  ['penDown', 'penMove', 'penUp'].forEach(function(motion) {
+    this.after(motion, function(e) {
+      if (this._currentTool) {
+        var fn = this._currentTool[motion];
+
+        if (fn) {
+          console.log(this._currentTool.name, e);
+          fn.apply(this._currentTool, [e]);
+        }
+      }
+    });
+  }, this);
 };
 
 SpriteEditorTools.prototype = {
   registerTool: function(tool) {
     this._tools[tool.name] = tool;
-  },
-
-  applyCurrentTool: function(evt) {
-    if (!this._currentTool) {
-      return;
-    }
-    this._currentTool.apply(evt);
   },
 
   _setTool: function(value) {
