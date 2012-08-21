@@ -19,11 +19,35 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
   },
 
   syncUI: function() {
+    if (this._settingAttrs) {
+      return;
+    }
+
     this.get('displayCanvas').clear(this.get('workspaceColor'));
     this.get('canvas').copyTo(
         this.get('displayCanvas'),
         -this.get('viewport.x'),
         -this.get('viewport.y'));
+  },
+
+  // Reimplemented so we don't redraw after
+  // every attribute change, but rather
+  // do one redraw at the end
+  setAttrs: function(attrs) {
+    this._settingAttrs = true;
+    var retVal = SpriteEditor.superclass.setAttrs.call(this, attrs);
+    this._settingAttrs = false;
+
+    this.syncUI();
+
+    return retVal;
+  },
+
+  toCanvasCoords: function(point) {
+    return {
+      x: this.get('viewport.x') + point.x,
+      y: this.get('viewport.y') + point.y
+    }
   },
 
   CONTENT_TEMPLATE: null,
@@ -37,13 +61,15 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
       value: 500,
       setter: function(value) { this.get('displayCanvas').set('height', value); }
     },
+    // TODO: Use this for pan / zoom
     viewport: {
       valueFn: function() {
         return {
+          // Upper-left corner of the viewport, relative to
+          // the upper-left corner of the canvas.
           x: 0,
           y: 0,
-          width: this.get('canvas').get('width'),
-          height: this.get('canvas').get('height')
+          zoom: 1
         };
       }
     },

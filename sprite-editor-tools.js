@@ -16,6 +16,7 @@ var PencilTool = {
   select: function(editor) {
     var contentBox = editor.get('contentBox');
     contentBox.setStyle('cursor', '');
+
     this._editor = editor
   },
 
@@ -29,7 +30,9 @@ var PencilTool = {
 
   _paint: function(x,y) {
     var color = this._editor.get('brushColor');
-    this._editor.get('canvas').setPixel(x, y, color);
+    var point = this._editor.toCanvasCoords({x:x, y:y});
+
+    this._editor.get('canvas').setPixel(point.x, point.y, color);
   }
 };
 
@@ -37,9 +40,27 @@ var HandTool = {
   name: 'hand',
 
   select: function(editor) {
-    var contentBox = editor.get('contentBox');
-    contentBox.setStyle('cursor', '-webkit-grab');
-    contentBox.setStyle('cursor', '-moz-grab');
+    this._editor = editor;
+    this._setCursor('grab');
+  },
+
+  penDown: function(e) {
+    this._start = e;
+    this._oldViewport = this._editor.get('viewport');
+    this._setCursor('grabbing');
+  },
+
+  penMove: function(e) {
+    this._editor.setAttrs({
+      'viewport.x': this._oldViewport.x + (this._start.x - e.x),
+      'viewport.y': this._oldViewport.y + (this._start.y - e.y)
+    });
+  },
+
+  _setCursor: function(type) {
+    var contentBox = this._editor.get('contentBox');
+    contentBox.setStyle('cursor', '-webkit-' + type);
+    contentBox.setStyle('cursor', '-moz-' + type);
   }
 };
 
@@ -60,7 +81,7 @@ var SpriteEditorTools = function() {
 
         if (fn) {
           console.log(this._currentTool.name, e);
-          fn.apply(this._currentTool, [e]);
+          fn.call(this._currentTool, e);
         }
       }
     });
@@ -77,8 +98,13 @@ SpriteEditorTools.prototype = {
       return Y.AttributeCore.INVALID_VALUE;
     }
 
-    this._currentTool = this._tools[value];
-    this._currentTool.select(this);
+    var newTool = this._tools[value];
+
+    // Selecting the same tool again does nothing
+    if (newTool !== this._currentTool) {
+      this._currentTool = newTool;
+      this._currentTool.select(this);
+    }
   }
 };
 
