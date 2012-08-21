@@ -80,7 +80,6 @@ var SpriteEditorTools = function() {
         var fn = this._currentTool[motion];
 
         if (fn) {
-          console.log(this._currentTool.name, e);
           fn.call(this._currentTool, e);
         }
       }

@@ -28,18 +28,13 @@ var Canvas = Y.Base.create("Canvas", Y.Base, [], {
     this._context.fillRect(0, 0, this.get('width'), this.get('height'));
   },
 
-  copyTo: function(other, dx, dy) {
-    var width = this._canvas.width;
-    var height = this._canvas.height;
-    if (!Y.Lang.isValue(dx)) { dx = 0; }
-    if (!Y.Lang.isValue(dy)) { dy = 0; }
-
-    other._drawImage(this._canvas, dx, dy, width, height);
+  copyTo: function(other, sx, sy, sw, sh, dx, dy, dw, dh) {
+    other._drawImage(this._canvas, sx, sy, sw, sh, dx, dy, dw, dh);
   },
 
-  _drawImage: function(image, dx, dy, width, height) {
+  _drawImage: function(image, sx, sy, sw, sh, dx, dy, dw, dh) {
     this._setImageSmoothingEnabled(this.get('imageSmoothingEnabled'));
-    this._context.drawImage(image, dx, dy, width, height);
+    this._context.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
   },
 
   _setImageSmoothingEnabled: function(value) {

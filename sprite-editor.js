@@ -23,11 +23,24 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
       return;
     }
 
+    var canvas = this.get('canvas');
+    var zoom = this.get('viewport.zoom');
+
     this.get('displayCanvas').clear(this.get('workspaceColor'));
-    this.get('canvas').copyTo(
+
+    // TODO: Might perform better if we actually use
+    // the sx, sy, sw, and sh parameters to
+    // copy only a subregion of the canvas.
+    canvas.copyTo(
         this.get('displayCanvas'),
-        -this.get('viewport.x'),
-        -this.get('viewport.y'));
+        0, // sx
+        0, // sy
+        canvas.get('width'), //sw
+        canvas.get('height'), //sh
+        -this.get('viewport.x'), //dx
+        -this.get('viewport.y'), //dy
+        canvas.get('width')*zoom, //dw
+        canvas.get('height')*zoom); //dh
   },
 
   // Reimplemented so we don't redraw after
@@ -44,9 +57,11 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
   },
 
   toCanvasCoords: function(point) {
+    var zoom = this.get('viewport.zoom');
+
     return {
-      x: this.get('viewport.x') + point.x,
-      y: this.get('viewport.y') + point.y
+      x: Math.floor((this.get('viewport.x') + point.x) / zoom),
+      y: Math.floor((this.get('viewport.y') + point.y) / zoom)
     }
   },
 
@@ -61,16 +76,13 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
       value: 500,
       setter: function(value) { this.get('displayCanvas').set('height', value); }
     },
-    // TODO: Use this for pan / zoom
     viewport: {
-      valueFn: function() {
-        return {
-          // Upper-left corner of the viewport, relative to
-          // the upper-left corner of the canvas.
-          x: 0,
-          y: 0,
-          zoom: 1
-        };
+      value: {
+        // Upper-left corner of the viewport, relative to
+        // the upper-left corner of the canvas.
+        x: 0,
+        y: 0,
+        zoom: 1
       }
     },
     workspaceColor: { value: "grey" },
