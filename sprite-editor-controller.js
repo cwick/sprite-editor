@@ -13,6 +13,7 @@ SpriteEditorController.prototype = {
 
     contentBox.on('mousewheel', function(e) {
       // TODO: use proper transformation matrices
+      // TODO: put in tool
       var IN=1, OUT=-1,
         // How many times bigger or smaller the image gets
         // when we zoom
@@ -25,20 +26,19 @@ SpriteEditorController.prototype = {
         translateX,
         translateY;
 
-      if (direction == IN) {
-        translate *= 0.5;
-      } else {
-        translate *= 0.5/FACTOR;
-      }
+      // if (direction == IN) {
+      //   translate *= 0.5;
+      // } else {
+      //   translate *= 0.5/FACTOR;
+      // }
 
-      translateX = canvas.get('width') * translate;
-      translateY = canvas.get('height') * translate;
+      // translateX = canvas.get('width') * translate;
+      // translateY = canvas.get('height') * translate;
 
-      console.log(direction);
       this.setAttrs({
         'viewport.zoom': viewport.zoom * change,
-        'viewport.x': viewport.x + translateX,
-        'viewport.y': viewport.y + translateY
+        // 'viewport.x': viewport.x + translateX,
+        // 'viewport.y': viewport.y + translateY
       });
 
       e.preventDefault();

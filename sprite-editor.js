@@ -23,24 +23,38 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
       return;
     }
 
-    var canvas = this.get('canvas');
-    var zoom = this.get('viewport.zoom');
+    var displayCanvas = this.get('displayCanvas'),
+        canvas = this.get('canvas'),
+        zoom = this.get('viewport.zoom'),
+        transform = new Y.Matrix();
 
-    this.get('displayCanvas').clear(this.get('workspaceColor'));
 
-    // TODO: Might perform better if we actually use
-    // the sx, sy, sw, and sh parameters to
-    // copy only a subregion of the canvas.
-    canvas.copyTo(
-        this.get('displayCanvas'),
-        0, // sx
-        0, // sy
-        canvas.get('width'), //sw
-        canvas.get('height'), //sh
-        -this.get('viewport.x'), //dx
-        -this.get('viewport.y'), //dy
-        canvas.get('width')*zoom, //dw
-        canvas.get('height')*zoom); //dh
+    console.log(this.get('viewport'));
+    // Zoom it relative to center of workspace
+    transform.translate(displayCanvas.get('width')/2,
+                        displayCanvas.get('height')/2);
+    transform.scale(zoom, zoom);
+    transform.translate(-displayCanvas.get('width')/2,
+                        -displayCanvas.get('height')/2);
+
+    // Position the viewport
+    transform.translate(-this.get('viewport.x'),
+                        -this.get('viewport.y'));
+
+    // Translate it so when viewport is (0,0) we
+    // place the uppper-left pixel of the canvas
+    // in the middle of the workspace
+    transform.translate(displayCanvas.get('width')/2,
+                        displayCanvas.get('height')/2);
+    // transform.translate(-canvas.get('width')/2,
+    //                     -canvas.get('height')/2);
+
+    // transform.translate(-canvas.get('width')/2,
+    //                     -canvas.get('height')/2);
+
+    displayCanvas.clear(this.get('workspaceColor'));
+
+    this.get('canvas').copyTo(displayCanvas, transform);
   },
 
   // Reimplemented so we don't redraw after
@@ -104,8 +118,9 @@ Y.namespace("Game").SpriteEditor = SpriteEditor;
   'game-sprite-editor-tools',
   'game-sprite-editor-controller',
   'game-canvas',
+  'base',
   'event-move',
   'node',
-  'base',
+  'matrix',
   'widget'] });
 

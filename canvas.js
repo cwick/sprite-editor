@@ -25,17 +25,35 @@ var Canvas = Y.Base.create("Canvas", Y.Base, [], {
   },
 
   clear: function(color) {
+    this.resetTransform();
     this._context.fillStyle = color;
     this._context.fillRect(0, 0, this.get('width'), this.get('height'));
   },
 
-  copyTo: function(other, sx, sy, sw, sh, dx, dy, dw, dh) {
-    other._drawImage(this._canvas, sx, sy, sw, sh, dx, dy, dw, dh);
+  copyTo: function(other, transform) {
+    other._drawImage(this._canvas, transform);
   },
 
-  _drawImage: function(image, sx, sy, sw, sh, dx, dy, dw, dh) {
+  resetTransform: function() {
+    this._context.setTransform(1,0,0,1,0,0);
+  },
+
+  _drawImage: function(image, transform) {
+    var matrix = transform.getMatrixArray();
+
+    this.resetTransform();
     this._setImageSmoothingEnabled(this.get('imageSmoothingEnabled'));
-    this._context.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
+
+    this._context.translate(matrix[0][2], matrix[1][2]);
+    this._context.transform(
+        matrix[0][0],
+        matrix[0][1],
+        matrix[1][0],
+        matrix[1][1],
+        matrix[2][0],
+        matrix[2][1]);
+
+    this._context.drawImage(image, 0,0);
   },
 
   _setImageSmoothingEnabled: function(value) {
