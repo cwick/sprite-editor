@@ -11,6 +11,39 @@ SpriteEditorController.prototype = {
     var contentBox = this.get("contentBox");
     var document = Y.one('document');
 
+    contentBox.on('mousewheel', function(e) {
+      // TODO: use proper transformation matrices
+      var IN=1, OUT=-1,
+        // How many times bigger or smaller the image gets
+        // when we zoom
+        FACTOR=2,
+        viewport = this.get('viewport'),
+        canvas = this.get('canvas'),
+        direction = e.wheelDelta > 0 ? IN : OUT,
+        change = direction == IN ? FACTOR : 1/FACTOR,
+        translate = viewport.zoom*direction,
+        translateX,
+        translateY;
+
+      if (direction == IN) {
+        translate *= 0.5;
+      } else {
+        translate *= 0.5/FACTOR;
+      }
+
+      translateX = canvas.get('width') * translate;
+      translateY = canvas.get('height') * translate;
+
+      console.log(direction);
+      this.setAttrs({
+        'viewport.zoom': viewport.zoom * change,
+        'viewport.x': viewport.x + translateX,
+        'viewport.y': viewport.y + translateY
+      });
+
+      e.preventDefault();
+    }, this);
+
     document.on('keydown', function(e) {
       if (e.keyCode == KEY_SPACE) {
         this.set('tool', 'hand');
