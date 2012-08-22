@@ -51,9 +51,10 @@ var HandTool = {
   },
 
   penMove: function(e) {
+    var zoom = this._editor.get('viewport.zoom');
     this._editor.setAttrs({
-      'viewport.x': this._oldViewport.x + (this._start.x - e.x),
-      'viewport.y': this._oldViewport.y + (this._start.y - e.y)
+      'viewport.x': (this._oldViewport.x + (this._start.x - e.x)/zoom),
+      'viewport.y': (this._oldViewport.y + (this._start.y - e.y)/zoom)
     });
   },
 

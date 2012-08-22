@@ -29,28 +29,18 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
         transform = new Y.Matrix();
 
 
-    console.log(this.get('viewport'));
+    // TODO: get rid of this matrix stuff, just use math
+    // based on what toCanvasCoords does. (do the inverse)
     // Zoom it relative to center of workspace
     transform.translate(displayCanvas.get('width')/2,
                         displayCanvas.get('height')/2);
     transform.scale(zoom, zoom);
-    transform.translate(-displayCanvas.get('width')/2,
-                        -displayCanvas.get('height')/2);
+    // transform.translate(-displayCanvas.get('width')/2,
+    //                     -displayCanvas.get('height')/2);
 
     // Position the viewport
     transform.translate(-this.get('viewport.x'),
                         -this.get('viewport.y'));
-
-    // Translate it so when viewport is (0,0) we
-    // place the uppper-left pixel of the canvas
-    // in the middle of the workspace
-    transform.translate(displayCanvas.get('width')/2,
-                        displayCanvas.get('height')/2);
-    // transform.translate(-canvas.get('width')/2,
-    //                     -canvas.get('height')/2);
-
-    // transform.translate(-canvas.get('width')/2,
-    //                     -canvas.get('height')/2);
 
     displayCanvas.clear(this.get('workspaceColor'));
 
@@ -70,12 +60,19 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
     return retVal;
   },
 
+  // Translate a point on the workspace onto a point on the canvas
   toCanvasCoords: function(point) {
-    var zoom = this.get('viewport.zoom');
+    var zoom = this.get('viewport.zoom'),
+        displayCanvas = this.get('displayCanvas'),
+        displayWidth = displayCanvas.get('width'),
+        displayHeight = displayCanvas.get('height'),
+
+        x = ((point.x - displayWidth/2) / zoom) + this.get('viewport.x');
+        y = ((point.y - displayHeight/2) / zoom) + this.get('viewport.y');
 
     return {
-      x: Math.floor((this.get('viewport.x') + point.x) / zoom),
-      y: Math.floor((this.get('viewport.y') + point.y) / zoom)
+      x: Math.floor(x),
+      y: Math.floor(y)
     }
   },
 
