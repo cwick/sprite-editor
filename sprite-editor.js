@@ -26,25 +26,18 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
     var displayCanvas = this.get('displayCanvas'),
         canvas = this.get('canvas'),
         zoom = this.get('viewport.zoom'),
-        transform = new Y.Matrix();
-
-
-    // TODO: get rid of this matrix stuff, just use math
-    // based on what toCanvasCoords does. (do the inverse)
-    // Zoom it relative to center of workspace
-    transform.translate(displayCanvas.get('width')/2,
-                        displayCanvas.get('height')/2);
-    transform.scale(zoom, zoom);
-    // transform.translate(-displayCanvas.get('width')/2,
-    //                     -displayCanvas.get('height')/2);
-
-    // Position the viewport
-    transform.translate(-this.get('viewport.x'),
-                        -this.get('viewport.y'));
+        x=0,y=0,
+        width = canvas.get('width'),
+        height = canvas.get('height');
 
     displayCanvas.clear(this.get('workspaceColor'));
 
-    this.get('canvas').copyTo(displayCanvas, transform);
+    canvas.copyTo(
+        displayCanvas,
+        ((x - this.get('viewport.x')) * zoom) + displayCanvas.get('width')/2,
+        ((y - this.get('viewport.y')) * zoom) + displayCanvas.get('height')/2,
+        width * zoom,
+        height * zoom);
   },
 
   // Reimplemented so we don't redraw after
@@ -61,14 +54,18 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
   },
 
   // Translate a point on the workspace onto a point on the canvas
-  toCanvasCoords: function(point) {
+  // viewport, if not given, defaults to the current viewport
+  toCanvasCoords: function(point, viewport) {
     var zoom = this.get('viewport.zoom'),
         displayCanvas = this.get('displayCanvas'),
         displayWidth = displayCanvas.get('width'),
         displayHeight = displayCanvas.get('height'),
+        viewport = viewport || this.get('viewport'),
 
-        x = ((point.x - displayWidth/2) / zoom) + this.get('viewport.x');
-        y = ((point.y - displayHeight/2) / zoom) + this.get('viewport.y');
+        // This is the inverse of the transform applied
+        // by syncUI.
+        x = ((point.x - displayWidth/2) / zoom) + viewport.x,
+        y = ((point.y - displayHeight/2) / zoom) + viewport.y;
 
     return {
       x: Math.floor(x),
@@ -118,6 +115,5 @@ Y.namespace("Game").SpriteEditor = SpriteEditor;
   'base',
   'event-move',
   'node',
-  'matrix',
   'widget'] });
 

@@ -40,21 +40,27 @@ var HandTool = {
   name: 'hand',
 
   select: function(editor) {
+    console.log('hand select');
     this._editor = editor;
     this._setCursor('grab');
   },
 
   penDown: function(e) {
+    console.log('hand down');
+    e = this._editor.toCanvasCoords(e);
+
     this._start = e;
     this._oldViewport = this._editor.get('viewport');
     this._setCursor('grabbing');
   },
 
   penMove: function(e) {
-    var zoom = this._editor.get('viewport.zoom');
+    console.log('hand move');
+    e = this._editor.toCanvasCoords(e, this._oldViewport);
+
     this._editor.setAttrs({
-      'viewport.x': (this._oldViewport.x + (this._start.x - e.x)/zoom),
-      'viewport.y': (this._oldViewport.y + (this._start.y - e.y)/zoom)
+      'viewport.x': this._oldViewport.x + (this._start.x - e.x),
+      'viewport.y': this._oldViewport.y + (this._start.y - e.y)
     });
   },
 
