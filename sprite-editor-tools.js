@@ -10,6 +10,26 @@ YUI.add('game-sprite-editor-tools', function(Y) {
 //   function penUp(MotionEvent)
 // }
 
+var ZoomTool = {
+  name: 'zoom',
+  defaultZoomFactor: 2,
+
+  action: function(e) {
+    var viewport = this.editor.get('viewport'),
+        factor = e.factor || this.defaultZoomFactor,
+        change = factor;
+
+console.log(e);
+    if (e.action == 'zoomOut') {
+      change = 1/factor;
+    }
+
+    this.editor.setAttrs({
+      'viewport.zoom': viewport.zoom * change
+    });
+  }
+};
+
 var PencilTool = {
   name: 'pencil',
 
@@ -72,16 +92,13 @@ var HandTool = {
   }
 };
 
-var TOOLS = [PencilTool, HandTool];
+var TOOLS = [PencilTool, HandTool, ZoomTool];
 
 var SpriteEditorTools = function() {
   this._tools = {};
 
   TOOLS.forEach(function(toolFn){
-    var tool = Y.Object(toolFn);
-    tool.isActive = false;
-
-    this.registerTool(tool);
+    this.registerTool(Y.Object(toolFn));
   }, this);
 
   // Send pen motion events to the current tool
@@ -91,11 +108,9 @@ var SpriteEditorTools = function() {
         var motionResponse = this._currentTool[motion];
 
         if (e.type.indexOf('penDown') != -1) {
-          console.log('active');
           this._currentTool.isActive = true;
         }
         else if (e.type.indexOf('penUp') != -1) {
-          console.log('inactive');
           this._currentTool.isActive = false;
         }
 
@@ -109,12 +124,37 @@ var SpriteEditorTools = function() {
 
 SpriteEditorTools.prototype = {
   registerTool: function(tool) {
+    tool.isActive = false;
+    tool.editor = this;
     this._tools[tool.name] = tool;
   },
 
+  applyTool: function(tool, action) {
+    tool = this._getTool(tool);
+    if (tool) {
+      if (Y.Lang.isFunction(tool[action])) {
+        tool[action]();
+      }
+      else if (Y.Lang.isFunction(tool.action)) {
+        tool.action({
+          action: action
+        });
+      }
+    }
+  },
+
+  _getTool: function(name) {
+    return this._tools[name];
+  },
+
+  _toolRegistered: function(name) {
+    return name in this._tools;
+  },
+
+  // value: name of the tool to set
   _setTool: function(value) {
     // Unknown tool
-    if (!(value in this._tools)) {
+    if (!this._toolRegistered(value)) {
       return Y.AttributeCore.INVALID_VALUE;
     }
 
@@ -128,8 +168,10 @@ SpriteEditorTools.prototype = {
     // Selecting the same tool again does nothing
     if (newTool !== this._currentTool) {
       this._currentTool = newTool;
-      this._currentTool.editor = this;
-      this._currentTool.select();
+
+      if (Y.Lang.isFunction(this._currentTool.select)) {
+        this._currentTool.select();
+      }
     }
   }
 };

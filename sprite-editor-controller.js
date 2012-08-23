@@ -12,22 +12,7 @@ SpriteEditorController.prototype = {
     var document = Y.one('document');
 
     contentBox.on('mousewheel', function(e) {
-      // TODO: put in tool
-      var IN=1, OUT=-1,
-        // How many times bigger or smaller the image gets
-        // when we zoom
-        FACTOR=2,
-        viewport = this.get('viewport'),
-        canvas = this.get('canvas'),
-        direction = e.wheelDelta > 0 ? IN : OUT,
-        change = direction == IN ? FACTOR : 1/FACTOR,
-        translate = viewport.zoom*direction,
-        translateX,
-        translateY;
-
-      this.setAttrs({
-        'viewport.zoom': viewport.zoom * change,
-      });
+      this.applyTool('zoom', e.wheelDelta > 0 ? 'zoomIn' : 'zoomOut');
 
       e.preventDefault();
     }, this);
