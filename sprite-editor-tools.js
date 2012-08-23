@@ -10,6 +10,27 @@ YUI.add('game-sprite-editor-tools', function(Y) {
 //   function penUp(MotionEvent)
 // }
 
+// TODO: Should separate the tool's interaction from its function, so
+// we can support undo easily.
+// For example, the basic function of a line tool is to draw
+// a line from point A to B. Before the line is actually drawn,
+// there might be a complex user interaction, where a
+// preview of the line is continually drawn while the user
+// moves the mouse. In other words, there should be a core
+// 'drawLine' function that can be called when
+// we just want to draw the line non-interactively.
+
+// A basic pencil-like tool will only implement the above interface
+// For tools that don't follow the pen down/move/up model, like
+// a zoom tool, you can implement custom actions. See ZoomTool for
+// example
+
+// Note: tools should probably be implemented so they
+// can work without first being selected.
+// For example, you might use a zoom tool by pressing a keyboard
+// shortcut, or by first selecting it from a toolbar and using the
+// mouse. Such a tool should support both modes of operation
+
 var ZoomTool = {
   name: 'zoom',
   defaultZoomFactor: 2,
@@ -19,7 +40,6 @@ var ZoomTool = {
         factor = e.factor || this.defaultZoomFactor,
         change = factor;
 
-console.log(e);
     if (e.action == 'zoomOut') {
       change = 1/factor;
     }
