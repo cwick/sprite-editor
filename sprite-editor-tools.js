@@ -13,11 +13,9 @@ YUI.add('game-sprite-editor-tools', function(Y) {
 var PencilTool = {
   name: 'pencil',
 
-  select: function(editor) {
-    var contentBox = editor.get('contentBox');
+  select: function() {
+    var contentBox = this.editor.get('contentBox');
     contentBox.setStyle('cursor', '');
-
-    this._editor = editor
   },
 
   penDown: function(e) {
@@ -29,43 +27,46 @@ var PencilTool = {
   },
 
   _paint: function(x,y) {
-    var color = this._editor.get('brushColor');
-    var point = this._editor.toCanvasCoords({x:x, y:y});
+    var color = this.editor.get('brushColor');
+    var point = this.editor.toCanvasCoords({x:x, y:y});
 
-    this._editor.get('canvas').setPixel(point.x, point.y, color);
+    this.editor.get('canvas').setPixel(point.x, point.y, color);
   }
 };
 
 var HandTool = {
   name: 'hand',
 
-  select: function(editor) {
+  select: function() {
     console.log('hand select');
-    this._editor = editor;
     this._setCursor('grab');
   },
 
   penDown: function(e) {
     console.log('hand down');
-    e = this._editor.toCanvasCoords(e);
+    e = this.editor.toCanvasCoords(e);
 
     this._start = e;
-    this._oldViewport = this._editor.get('viewport');
+    this._oldViewport = this.editor.get('viewport');
     this._setCursor('grabbing');
   },
 
   penMove: function(e) {
     console.log('hand move');
-    e = this._editor.toCanvasCoords(e, this._oldViewport);
+    e = this.editor.toCanvasCoords(e, this._oldViewport);
 
-    this._editor.setAttrs({
+    this.editor.setAttrs({
       'viewport.x': this._oldViewport.x + (this._start.x - e.x),
       'viewport.y': this._oldViewport.y + (this._start.y - e.y)
     });
   },
 
+  penUp: function() {
+    this.select();
+  },
+
   _setCursor: function(type) {
-    var contentBox = this._editor.get('contentBox');
+    var contentBox = this.editor.get('contentBox');
     contentBox.setStyle('cursor', '-webkit-' + type);
     contentBox.setStyle('cursor', '-moz-' + type);
   }
@@ -76,18 +77,30 @@ var TOOLS = [PencilTool, HandTool];
 var SpriteEditorTools = function() {
   this._tools = {};
 
-  TOOLS.forEach(function(tool){
-    this.registerTool(Y.Object(tool));
+  TOOLS.forEach(function(toolFn){
+    var tool = Y.Object(toolFn);
+    tool.isActive = false;
+
+    this.registerTool(tool);
   }, this);
 
   // Send pen motion events to the current tool
   ['penDown', 'penMove', 'penUp'].forEach(function(motion) {
     this.after(motion, function(e) {
       if (this._currentTool) {
-        var fn = this._currentTool[motion];
+        var motionResponse = this._currentTool[motion];
 
-        if (fn) {
-          fn.call(this._currentTool, e);
+        if (e.type.indexOf('penDown') != -1) {
+          console.log('active');
+          this._currentTool.isActive = true;
+        }
+        else if (e.type.indexOf('penUp') != -1) {
+          console.log('inactive');
+          this._currentTool.isActive = false;
+        }
+
+        if (motionResponse) {
+          motionResponse.call(this._currentTool, e);
         }
       }
     });
@@ -100,7 +113,13 @@ SpriteEditorTools.prototype = {
   },
 
   _setTool: function(value) {
+    // Unknown tool
     if (!(value in this._tools)) {
+      return Y.AttributeCore.INVALID_VALUE;
+    }
+
+    // Can't replace the current tool until this one finishes
+    if (this._currentTool && this._currentTool.isActive) {
       return Y.AttributeCore.INVALID_VALUE;
     }
 
@@ -109,7 +128,8 @@ SpriteEditorTools.prototype = {
     // Selecting the same tool again does nothing
     if (newTool !== this._currentTool) {
       this._currentTool = newTool;
-      this._currentTool.select(this);
+      this._currentTool.editor = this;
+      this._currentTool.select();
     }
   }
 };
