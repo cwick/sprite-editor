@@ -59,15 +59,18 @@ var PencilTool = {
   },
 
   penDown: function(e) {
-    this._paint(e.x, e.y);
+    this._paint(e);
   },
 
   penMove: function(e) {
-    this._paint(e.x, e.y);
+    this._paint(e);
   },
 
-  _paint: function(x,y) {
-    var color = this.editor.get('brushColor');
+  _paint: function(e) {
+    this.paint(e.x, e.y, this.editor.get('brushColor'));
+  },
+
+  paint: function(x, y, color) {
     var point = this.editor.toCanvasCoords({x:x, y:y});
 
     this.editor.get('canvas').setPixel(point.x, point.y, color);
@@ -78,12 +81,10 @@ var HandTool = {
   name: 'hand',
 
   select: function() {
-    console.log('hand select');
     this._setCursor('grab');
   },
 
   penDown: function(e) {
-    console.log('hand down');
     e = this.editor.toCanvasCoords(e);
 
     this._start = e;
@@ -92,7 +93,6 @@ var HandTool = {
   },
 
   penMove: function(e) {
-    console.log('hand move');
     e = this.editor.toCanvasCoords(e, this._oldViewport);
 
     this.editor.setAttrs({
