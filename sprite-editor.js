@@ -73,6 +73,26 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
     }
   },
 
+  _setViewport: function(value, fullName) {
+    var path = fullName.split('.');
+    if (path.length == 2) {
+      if (path[1] == 'zoom') {
+        value.zoom = this._constrainZoom(value.zoom);
+      }
+    }
+    return value;
+  },
+
+  _constrainZoom: function(value) {
+    var minZoom = 0.5;
+    var maxZoom = 8;
+
+    if (value < minZoom) { value = minZoom; }
+    if (value > maxZoom) { value = maxZoom; }
+
+    return value;
+  },
+
   CONTENT_TEMPLATE: null,
 }, {
   ATTRS: {
@@ -91,7 +111,8 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
         x: 0,
         y: 0,
         zoom: 1
-      }
+      },
+      setter: '_setViewport'
     },
     workspaceColor: { value: "grey" },
     // TODO: support CSS colors

@@ -33,20 +33,13 @@ YUI.add('game-sprite-editor-tools', function(Y) {
 
 var ZoomTool = {
   name: 'zoom',
-  defaultZoomFactor: 2,
+  DEFAULT_ZOOM_AMOUNT: 2,
 
-  action: function(e) {
+  scale: function(amount) {
     var viewport = this.editor.get('viewport'),
-        factor = e.factor || this.defaultZoomFactor,
-        change = factor;
+        amount = amount || this.DEFAULT_ZOOM_AMOUNT;
 
-    if (e.action == 'zoomOut') {
-      change = 1/factor;
-    }
-
-    this.editor.setAttrs({
-      'viewport.zoom': viewport.zoom * change
-    });
+    this.editor.set('viewport.zoom', viewport.zoom * amount);
   }
 };
 
@@ -117,8 +110,8 @@ var TOOLS = [PencilTool, HandTool, ZoomTool];
 var SpriteEditorTools = function() {
   this._tools = {};
 
-  TOOLS.forEach(function(toolFn){
-    this.registerTool(Y.Object(toolFn));
+  TOOLS.forEach(function(tool){
+    this.registerTool(Y.Object(tool));
   }, this);
 
   // Send pen motion events to the current tool
@@ -149,16 +142,14 @@ SpriteEditorTools.prototype = {
     this._tools[tool.name] = tool;
   },
 
-  applyTool: function(tool, action) {
+  applyTool: function(tool, action, args) {
     tool = this._getTool(tool);
     if (tool) {
       if (Y.Lang.isFunction(tool[action])) {
-        tool[action]();
+        tool[action](args);
       }
       else if (Y.Lang.isFunction(tool.action)) {
-        tool.action({
-          action: action
-        });
+        tool.action(action, args);
       }
     }
   },

@@ -12,7 +12,19 @@ SpriteEditorController.prototype = {
     var document = Y.one('document');
 
     contentBox.on('mousewheel', function(e) {
-      this.applyTool('zoom', e.wheelDelta > 0 ? 'zoomIn' : 'zoomOut');
+      var speedScale = .0005,
+          baseZoomAmount = 1.05,
+          // YUI gives us messed up values for e.wheelDelta, so use
+          // the natively reported wheelDelta value
+          speed = Math.abs(e._event.wheelDelta) * speedScale,
+          zoomFactor = baseZoomAmount + speed;
+
+      if (e.wheelDelta < 0) {
+        // Zooming out
+        zoomFactor = 1/zoomFactor;
+      }
+
+      this.applyTool('zoom', 'scale', zoomFactor);
 
       e.preventDefault();
     }, this);
