@@ -73,6 +73,12 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
     }
   },
 
+  isPointInCanvas: function(point) {
+    var canvas = this.get('canvas');
+    return point.x >=0 && point.x < canvas.get('width') &&
+           point.y >=0 && point.y < canvas.get('height');
+  },
+
   _setViewport: function(value, fullName) {
     var path = fullName.split('.');
     if (path.length == 2) {

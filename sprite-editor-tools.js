@@ -66,7 +66,9 @@ var PencilTool = {
   paint: function(x, y, color) {
     var point = this.editor.toCanvasCoords({x:x, y:y});
 
-    this.editor.get('canvas').setPixel(point.x, point.y, color);
+    if (this.editor.isPointInCanvas(point)) {
+      this.editor.get('canvas').setPixel(point.x, point.y, color);
+    }
   }
 };
 
