@@ -5,7 +5,7 @@ var Canvas = Y.Base.create("Canvas", Y.Base, [], {
 
   initializer: function() {
     this._canvas = document.createElement('canvas');
-    this._canvas.width=400;
+    this._canvas.width=200;
     this._canvas.height=200;
     // this._canvas.tabIndex = 1; // Allow the canvas to have focus
     this._context = this._canvas.getContext('2d');

@@ -16,9 +16,5 @@ YUI({
     width: 1024,
     height: 768
   });
-  // var editor2 = new Y.Game.SpriteEditor({
-  //   canvas: editor.canvas
-  // });
   editor.render();
-  // editor2.render();
 });

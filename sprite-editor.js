@@ -110,13 +110,16 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
       value: 500,
       setter: function(value) { this.get('displayCanvas').set('height', value); }
     },
+    // Upper-left corner of the viewport, relative to
+    // the upper-left corner of the canvas.
     viewport: {
-      value: {
-        // Upper-left corner of the viewport, relative to
-        // the upper-left corner of the canvas.
-        x: 0,
-        y: 0,
-        zoom: 1
+      valueFn: function() {
+        console.log(this.get('canvas').get('width'));
+        return {
+          x: this.get('canvas').get('width') / 2,
+          y: this.get('canvas').get('height') / 2,
+          zoom: 1
+        }
       },
       setter: '_setViewport'
     },
