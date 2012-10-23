@@ -114,7 +114,6 @@ var SpriteEditor = Y.Base.create("SpriteEditor", Y.Widget,
     // the upper-left corner of the canvas.
     viewport: {
       valueFn: function() {
-        console.log(this.get('canvas').get('width'));
         return {
           x: this.get('canvas').get('width') / 2,
           y: this.get('canvas').get('height') / 2,

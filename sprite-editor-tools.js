@@ -129,7 +129,7 @@ var SpriteEditorTools = function() {
           this._currentTool.isActive = false;
         }
 
-        if (motionResponse) {
+        if (this._currentTool.isActive && motionResponse) {
           motionResponse.call(this._currentTool, e);
         }
       }

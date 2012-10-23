@@ -43,26 +43,30 @@ SpriteEditorController.prototype = {
       }
     }, this);
 
-    contentBox.on("gesturemovestart", function(e) {
+    contentBox.on("mousedown", function(e) {
       if (e.button == MOUSE_LEFT) {
-        this._pen('penDown', e);
+        this._pen('Down', e);
       }
-    }, null, this);
+    }, this);
 
-    contentBox.on("gesturemove", function(e) {
-      this._pen('penMove', e);
-    }, null, this);
+    contentBox.on("mousemove", function(e) {
+      this._pen('Move', e);
+    }, this);
 
-    contentBox.on("gesturemoveend", function(e) {
-      this._pen('penUp', e);
-    }, null, this);
+    contentBox.on("mouseup", function(e) {
+      this._pen('Up', e);
+    }, this);
   },
 
   _pen: function(motion, e) {
-    this.fire(motion, {x: e._event.offsetX, y: e._event.offsetY});
+    this.fire('pen'+motion, {x: e._event.offsetX, y: e._event.offsetY});
   },
 };
 
-Y.namespace("Game").SpriteEditorController = SpriteEditorController;
+var game = Y.namespace("Game");
+game.SpriteEditorController = SpriteEditorController;
+game.KEY_SPACE = KEY_SPACE;
+game.MOUSE_LEFT = MOUSE_LEFT;
+
 }, "", { requires: [] });
 
